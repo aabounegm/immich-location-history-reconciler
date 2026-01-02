@@ -54,6 +54,7 @@ const pageOptions = [5, 10, 20, 50].map((count) => ({
         :loading="tagsStatus === 'pending'"
         show-clear
         filter
+        :pt="{overlay: {style: 'z-index: 10001'}}"
       />
       <Message v-if="tagsError" severity="error" size="small" variant="simple">
         Error {{ tagsError.data?.statusCode ?? tagsError.status }}:
@@ -70,6 +71,7 @@ const pageOptions = [5, 10, 20, 50].map((count) => ({
         :loading="cameraStatus === 'pending'"
         show-clear
         filter
+        :pt="{overlay: {style: 'z-index: 10001'}}"
       />
       <Message
         v-if="cameraError"
@@ -93,6 +95,7 @@ const pageOptions = [5, 10, 20, 50].map((count) => ({
         option-label="label"
         option-value="value"
         filter
+        :pt="{overlay: {style: 'z-index: 10001'}}"
       />
     </div>
   </div>

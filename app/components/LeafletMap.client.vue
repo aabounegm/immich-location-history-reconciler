@@ -37,7 +37,7 @@ const searchControl = GeoSearchControl({
 });
 
 onMounted(() => {
-  map.value = L.map(mapContainer.value).setView([0, 0], 0);
+  map.value = L.map(mapContainer.value!).setView([0, 0], 0);
   map.value.attributionControl.setPrefix("Leaflet");
   map.value.addControl(searchControl);
 
