@@ -20,7 +20,7 @@ const tagIds = useLocalStorage<string[]>("tag-ids", []);
 const isNotInAlbum = useLocalStorage("is-not-in-album", false);
 const pageSize = useLocalStorage("page-size", 10);
 
-// Display settings
+// Location estimation settings
 
 const skipUnestimated = useLocalStorage("skip-unestimated", false);
 const autoConfirmSuboptimal = useLocalStorage("auto-confirm-suboptimal", false);
@@ -71,7 +71,7 @@ const autoConfirmSuboptimal = useLocalStorage("auto-confirm-suboptimal", false);
           />
         </div>
         <div class="mt-2">
-          <h2 class="text-lg font-semibold">Display settings</h2>
+          <h2 class="text-lg font-semibold">Location estimation settings</h2>
           <div class="flex items-center gap-2">
             <Checkbox v-model="skipUnestimated" input-id="skip-unestimated" binary />
             <label for="skip-unestimated">Skip assets with no location estimation</label>
