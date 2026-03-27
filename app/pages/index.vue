@@ -19,6 +19,10 @@ const cameraModel = useLocalStorage<string | null>("camera-model", null);
 const tagIds = useLocalStorage<string[]>("tag-ids", []);
 const isNotInAlbum = useLocalStorage("is-not-in-album", false);
 const pageSize = useLocalStorage("page-size", 10);
+
+// Display settings
+
+const skipUnestimated = useLocalStorage("skip-unestimated", false);
 </script>
 
 <template>
@@ -65,10 +69,17 @@ const pageSize = useLocalStorage("page-size", 10);
             v-model:page-size="pageSize"
           />
         </div>
+        <div class="mt-2">
+          <h2 class="text-lg font-semibold">Display settings</h2>
+          <div class="flex items-center gap-2">
+            <Checkbox v-model="skipUnestimated" input-id="skip-unestimated" binary />
+            <label for="skip-unestimated">Skip assets with no location estimation</label>
+          </div>
+        </div>
       </Panel>
     </header>
   </div>
   <main v-if="isServerInited" class="mt-4">
-    <ImagesSearch :tag-ids :is-not-in-album :camera-model :page-size />
+    <ImagesSearch :tag-ids :is-not-in-album :camera-model :page-size :skip-unestimated />
   </main>
 </template>

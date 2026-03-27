@@ -15,11 +15,13 @@ const {
   isNotInAlbum,
   cameraModel,
   pageSize = 10,
+  skipUnestimated = false,
 } = defineProps<{
   tagIds: string[];
   isNotInAlbum: boolean;
   cameraModel: string | null;
   pageSize?: number;
+  skipUnestimated?: boolean;
 }>();
 
 const { estimateLocationAtTime, timeline } = useTimeline();
@@ -125,20 +127,19 @@ const alreadySeenCount = computed(
 const updates = ref<Record<string, Item>>({});
 
 // TODO: find a better way to do this
-watch(items, (items) => {
+watch([items, () => skipUnestimated], ([items]) => {
+  const newUpdates: Record<string, Item> = {};
   for (const item of items) {
-    if (
-      updates.value[item.asset.id] == null ||
-      updates.value[item.asset.id].estimatedLocation == null
-    ) {
-      updates.value[item.asset.id] = item;
+    if (skipUnestimated && timeline != null && item.estimatedLocation == null) {
+      continue;
     }
+    const existing = updates.value[item.asset.id];
+    newUpdates[item.asset.id] =
+      existing != null && existing.estimatedLocation != null
+        ? existing
+        : item;
   }
-  for (const id in updates.value) {
-    if (!items.some((item) => item.asset.id === id)) {
-      delete updates.value[id];
-    }
-  }
+  updates.value = newUpdates;
 });
 
 const confirmedUpdates = computed(() =>
