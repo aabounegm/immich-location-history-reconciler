@@ -33,6 +33,13 @@ It also shows the information from your location history that was used to estima
 > The estimation is indicated by a red marker. You can click anywhere on the map to set the location manually.
 > Blue markers show visited places, blue lines show activities (walking, cycling, ...), and red paths show exact points you've been at a given time (this is the most accurate source).
 
+#### Display settings
+
+Under the "Configuration" panel, you will also find display settings to control the behavior of the location fixer:
+
+- **Skip assets with no location estimation**: When enabled, assets for which no location could be estimated from the timeline are excluded from the displayed results entirely, allowing you to focus only on assets that have a suggested location.
+- **Auto-confirm any estimation (possibly inaccurate)**: By default, only estimations from `timelinePath` segments (the most precise source) are auto-confirmed. Enabling this option will also auto-confirm estimations from less precise sources like `activity` and `visit` segments. Manually confirmed or unconfirmed assets are not affected when toggling this option.
+
 ### Timestamp fixer
 
 ![timestamp fixer page](./screenshots/timestamp-fixer.png)
