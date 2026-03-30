@@ -19,6 +19,11 @@ const cameraModel = useLocalStorage<string | null>("camera-model", null);
 const tagIds = useLocalStorage<string[]>("tag-ids", []);
 const isNotInAlbum = useLocalStorage("is-not-in-album", false);
 const pageSize = useLocalStorage("page-size", 10);
+
+// Location estimation settings
+
+const skipUnestimated = useLocalStorage("skip-unestimated", false);
+const autoConfirmSuboptimal = useLocalStorage("auto-confirm-suboptimal", false);
 </script>
 
 <template>
@@ -65,10 +70,28 @@ const pageSize = useLocalStorage("page-size", 10);
             v-model:page-size="pageSize"
           />
         </div>
+        <div class="mt-2">
+          <h2 class="text-lg font-semibold">Location estimation settings</h2>
+          <div class="flex items-center gap-2">
+            <Checkbox v-model="skipUnestimated" input-id="skip-unestimated" binary />
+            <label for="skip-unestimated">Skip assets with no location estimation</label>
+          </div>
+          <div class="flex items-center gap-2">
+            <Checkbox v-model="autoConfirmSuboptimal" input-id="auto-confirm-suboptimal" binary />
+            <label for="auto-confirm-suboptimal">Auto-confirm on <em>any</em> estimation (possibly inaccurate)</label>
+          </div>
+        </div>
       </Panel>
     </header>
   </div>
   <main v-if="isServerInited" class="mt-4">
-    <ImagesSearch :tag-ids :is-not-in-album :camera-model :page-size />
+    <ImagesSearch
+      :tag-ids
+      :is-not-in-album
+      :camera-model
+      :page-size
+      :skip-unestimated
+      :auto-confirm-suboptimal
+    />
   </main>
 </template>

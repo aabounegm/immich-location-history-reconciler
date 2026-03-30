@@ -15,11 +15,15 @@ const {
   isNotInAlbum,
   cameraModel,
   pageSize = 10,
+  skipUnestimated = false,
+  autoConfirmSuboptimal = false,
 } = defineProps<{
   tagIds: string[];
   isNotInAlbum: boolean;
   cameraModel: string | null;
   pageSize?: number;
+  skipUnestimated?: boolean;
+  autoConfirmSuboptimal?: boolean;
 }>();
 
 const { estimateLocationAtTime, timeline } = useTimeline();
@@ -87,6 +91,7 @@ type Item = {
   estimatedLocation: LatLng | undefined;
   geometry: Geometry[];
   confirmEdit: boolean;
+  autoConfirmed: boolean;
 };
 
 const alreadySeen = useLocalStorage<Set<string>>("already-seen", new Set());
@@ -100,16 +105,20 @@ const allAssets = useArrayMap<AssetResponseDto, Item>(
       segments = [],
     } = estimateLocationAtTime(new Date(asset.fileCreatedAt)) ?? {};
 
+    const isOptimal = estimateSource === "timelinePath";
+    const canConfirm =
+      bestEstimate != null &&
+      !asset.originalFileName.toLowerCase().includes("screenshot");
+    const confirmEdit = canConfirm && (autoConfirmSuboptimal || isOptimal);
+
     return {
       asset,
       estimatedLocation: bestEstimate?.point,
       geometry: segments
         .map(segmentToGeometry)
         .filter((geometry) => geometry != null),
-      confirmEdit:
-        bestEstimate != null &&
-        estimateSource === "timelinePath" &&
-        !asset.originalFileName.toLowerCase().includes("screenshot"),
+      confirmEdit,
+      autoConfirmed: confirmEdit && !isOptimal,
     };
   }
 );
@@ -125,20 +134,25 @@ const alreadySeenCount = computed(
 const updates = ref<Record<string, Item>>({});
 
 // TODO: find a better way to do this
-watch(items, (items) => {
+watch([items, () => skipUnestimated, () => autoConfirmSuboptimal], ([items]) => {
+  const newUpdates: Record<string, Item> = {};
   for (const item of items) {
-    if (
-      updates.value[item.asset.id] == null ||
-      updates.value[item.asset.id].estimatedLocation == null
-    ) {
-      updates.value[item.asset.id] = item;
+    if (skipUnestimated && timeline != null && item.estimatedLocation == null) {
+      continue;
+    }
+    const existing = updates.value[item.asset.id];
+    if (existing != null && existing.estimatedLocation != null) {
+      // Sync confirmEdit for auto-confirmed items; preserve manual confirmations
+      if (existing.autoConfirmed || (!existing.confirmEdit && item.autoConfirmed)) {
+        existing.confirmEdit = item.confirmEdit;
+        existing.autoConfirmed = item.autoConfirmed;
+      }
+      newUpdates[item.asset.id] = existing;
+    } else {
+      newUpdates[item.asset.id] = item;
     }
   }
-  for (const id in updates.value) {
-    if (!items.some((item) => item.asset.id === id)) {
-      delete updates.value[id];
-    }
-  }
+  updates.value = newUpdates;
 });
 
 const confirmedUpdates = computed(() =>
@@ -321,6 +335,7 @@ function clearHidden() {
                 else bulkCheckedIds.delete(asset.id);
               } else {
                 updates[asset.id].confirmEdit = val;
+                updates[asset.id].autoConfirmed = false;
               }
             }
           "
@@ -333,7 +348,10 @@ function clearHidden() {
           </Message>
           <LeafletMap
             v-model="updates[asset.id].estimatedLocation"
-            @update:model-value="updates[asset.id].confirmEdit = true"
+            @update:model-value="() => {
+              updates[asset.id].confirmEdit = true
+              updates[asset.id].autoConfirmed = false;
+            }"
             :segments="updates[asset.id].geometry"
           />
         </ImmichAsset>
