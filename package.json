@@ -11,7 +11,7 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "@immich/sdk": "^1.135.3",
+    "@immich/sdk": "^3.0.2",
     "@nuxt/eslint": "^1.5.2",
     "@primeuix/themes": "^1.2.1",
     "@primevue/forms": "^4.3.6",

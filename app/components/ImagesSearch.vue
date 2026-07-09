@@ -47,7 +47,7 @@ var {
     const previousAssets = result?.value?.assets ?? [];
 
     const searchFilters = {
-      country: "",
+      country: null,
       tagIds,
       isNotInAlbum,
       model: cameraModel,
