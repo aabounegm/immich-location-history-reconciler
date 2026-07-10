@@ -16,7 +16,7 @@ jobs:
       - run: corepack use pnpm@latest
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
       - run: pnpm install
       - run: NUXT_APP_BASE_URL=/immich-location-history-reconciler/ pnpx nuxt build --preset github_pages
       - name: Upload artifact
